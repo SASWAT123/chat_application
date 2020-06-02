@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:chatapplication/Services/auth.dart';
+import 'package:chatapplication/Screens/chatRoom.dart';
 
 class SignupPage extends StatefulWidget {
   @override
@@ -6,12 +8,36 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+
+  final _formKey = GlobalKey<FormState>();
+  bool isLoading = false;
+
+  AuthMethods authMethods = new AuthMethods();
+
+  TextEditingController emailTextEditingController = new TextEditingController();
+  TextEditingController passwordTextEditingController = new TextEditingController();
+  TextEditingController nameTextEditingController = new TextEditingController();
+
+  signUp() async {
+    if(_formKey.currentState.validate()) {
+      setState(() {
+        isLoading = true;
+      });
+      
+      authMethods.signUpWithEmailAndPassword(emailTextEditingController.text.trim(), passwordTextEditingController.text.trim())
+          .then((result){
+            Navigator.pushReplacement(context, MaterialPageRoute(
+              builder: (context) => ChatRoom()
+            ));
+          });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
         resizeToAvoidBottomPadding: false,
-        body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <
-            Widget>[
+        body: isLoading ? Container(child: Center(child: CircularProgressIndicator(),),) : Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
           Container(
             child: Stack(
               children: <Widget>[
@@ -40,40 +66,60 @@ class _SignupPageState extends State<SignupPage> {
               padding: EdgeInsets.only(top: 35.0, left: 20.0, right: 20.0),
               child: Column(
                 children: <Widget>[
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: 'EMAIL',
-                        labelStyle: TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
-                        // hintText: 'EMAIL',
-                        // hintStyle: ,
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.green))),
-                  ),
-                  SizedBox(height: 10.0),
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: 'PASSWORD ',
-                        labelStyle: TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.red))),
-                    obscureText: true,
-                  ),
-                  SizedBox(height: 10.0),
-                  TextField(
-                    decoration: InputDecoration(
-                        labelText: 'NAME ',
-                        labelStyle: TextStyle(
-                            fontFamily: 'Montserrat',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.grey),
-                        focusedBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(color: Colors.green))),
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          controller: emailTextEditingController,
+                          validator: (val){
+                            return RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(val) ?
+                            null : "Enter correct email";
+                          },
+                          decoration: InputDecoration(
+                              labelText: 'EMAIL',
+                              labelStyle: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                              // hintText: 'EMAIL',
+                              // hintStyle: ,
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.green))),
+                        ),
+                        SizedBox(height: 10.0),
+                        TextFormField(
+                          controller: passwordTextEditingController,
+                          validator:  (val){
+                            return val.length < 6 ? "Enter Password 6+ characters" : null;
+                          },
+                          decoration: InputDecoration(
+                              labelText: 'PASSWORD ',
+                              labelStyle: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.red))),
+                          obscureText: true,
+                        ),
+                        SizedBox(height: 10.0),
+                        TextFormField(
+                          controller: nameTextEditingController,
+                          validator: (val){
+                            return val.isEmpty || val.length < 3 ? "Enter Username 3+ characters" : null;
+                          },
+                          decoration: InputDecoration(
+                              labelText: 'NAME ',
+                              labelStyle: TextStyle(
+                                  fontFamily: 'Montserrat',
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey),
+                              focusedBorder: UnderlineInputBorder(
+                                  borderSide: BorderSide(color: Colors.green))),
+                        ),
+                      ],
+                    ),
                   ),
                   SizedBox(height: 50.0),
                   Container(
@@ -84,7 +130,9 @@ class _SignupPageState extends State<SignupPage> {
                         color: Colors.red,
                         elevation: 7.0,
                         child: GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            signUp();
+                          },
                           child: Center(
                             child: Text(
                               'SIGNUP',
