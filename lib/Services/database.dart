@@ -13,6 +13,12 @@ class DatabaseMethods{
         .getDocuments();
   }
 
+  getUserByEmail(String userEmail) async{
+    return await Firestore.instance.collection("Users")
+        .where("email", isEqualTo: userEmail)
+        .getDocuments();
+  }
+
   createChatRoom(String chatRoomId, chatRoomData){
     Firestore.instance.collection("ChatRoom")
         .document(chatRoomId).setData(chatRoomData)

@@ -1,3 +1,4 @@
+import 'package:chatapplication/Helper/helperFunctions.dart';
 import 'package:chatapplication/Services/database.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapplication/Services/auth.dart';
@@ -28,6 +29,9 @@ class _SignupPageState extends State<SignupPage> {
         "email" : emailTextEditingController.text,
       };
 
+      HelperFunctions.saveUserEmailSharedPreference(emailTextEditingController.text);
+      HelperFunctions.saveUserNameSharedPreference(nameTextEditingController.text);
+
       setState(() {
         isLoading = true;
       });
@@ -35,6 +39,7 @@ class _SignupPageState extends State<SignupPage> {
       authMethods.signUpWithEmailAndPassword(emailTextEditingController.text.trim(), passwordTextEditingController.text.trim())
           .then((result){
             databaseMethods.uploadUserInfo(userData);
+            HelperFunctions.saveUserLoggedInSharedPreference(true);
             Navigator.pushReplacement(context, MaterialPageRoute(
               builder: (context) => ChatRoom()
             ));

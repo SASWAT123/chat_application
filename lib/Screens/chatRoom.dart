@@ -1,3 +1,5 @@
+import 'package:chatapplication/Helper/constants.dart';
+import 'package:chatapplication/Helper/helperFunctions.dart';
 import 'package:chatapplication/Screens/search.dart';
 import 'package:chatapplication/Screens/signIn.dart';
 import 'package:chatapplication/Services/auth.dart';
@@ -20,6 +22,16 @@ class _ChatRoomState extends State<ChatRoom> {
         ));
       });
 
+  }
+
+  @override
+  void initState() {
+    getUserInfo();
+    super.initState();
+  }
+
+  getUserInfo() async{
+    Constants.currentUserName = await HelperFunctions.getUserNameSharedPreference();
   }
 
   @override

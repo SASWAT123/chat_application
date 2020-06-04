@@ -1,3 +1,5 @@
+import 'package:chatapplication/Helper/constants.dart';
+import 'package:chatapplication/Screens/conversation.dart';
 import 'package:chatapplication/Services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -23,12 +25,6 @@ class _SearchScreenState extends State<SearchScreen> {
         });
   }
 
-  createChatRoomStartConversation(String userName, currentUserName){
-
-    List<String> users = [];
-    //databaseMethods.createChatRoom(chatRoomId, chatRoomData)
-  }
-
   Widget searchList(){
     return searchResultSnapshot != null ? ListView.builder(
       itemCount: searchResultSnapshot.documents.length,
@@ -41,9 +37,66 @@ class _SearchScreenState extends State<SearchScreen> {
       }) : Container();
   }
 
+  createChatRoomStartConversation({String userName}){
+
+    if(userName != Constants.currentUserName){
+      String chatRoomId = getChatRoomId(userName, Constants.currentUserName);
+      List<String> users = [userName, Constants.currentUserName];
+      Map<String, dynamic> chatRoomMap = {
+        "users" : users,
+        "chatRoomId" :chatRoomId
+      };
+      DatabaseMethods().createChatRoom(chatRoomId, chatRoomMap);
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationScreen()));
+    }else{
+      print("Cannot send message to yourself");
+    }
+
+
+  }
+
+  Widget SearchTile({String userName, String userEmail}){
+    return Container(
+      padding: EdgeInsets.symmetric(),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                userName,
+                style: TextStyle(
+                  fontFamily: "Montserrat",
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                userEmail,
+                style: TextStyle(
+                  fontFamily: "Montserrat",
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          Spacer(),
+          IconButton(
+            icon: Icon(Icons.message),
+            tooltip: 'Message',
+            onPressed: () {
+              createChatRoomStartConversation(
+                userName: userName
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void initState() {
-
     super.initState();
   }
 
@@ -115,48 +168,12 @@ class _SearchScreenState extends State<SearchScreen> {
   }
 }
 
-class SearchTile extends StatelessWidget {
-
-  final String userName;
-  final String userEmail;
-
-  SearchTile({this.userName, this.userEmail});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                userName,
-                style: TextStyle(
-                  fontFamily: "Montserrat",
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              Text(
-                userEmail,
-                style: TextStyle(
-                  fontFamily: "Montserrat",
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          Spacer(),
-          IconButton(
-            icon: Icon(Icons.message),
-            tooltip: 'Message',
-            onPressed: () {},
-          ),
-        ],
-      ),
-    );
+getChatRoomId(String a, String b) {
+  if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+    return "$b\_$a";
+  } else {
+    return "$a\_$b";
   }
 }
+
 
