@@ -1,6 +1,6 @@
 # chatapplication
 
-A new Flutter application.
+This is a Flutter chat application. I am using Firebase for real time data sync. This is a very good project to understand how Flutter and Firebase can work together. Real time chat features are available in this application.
 
 ## Getting Started
 
