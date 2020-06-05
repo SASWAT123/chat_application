@@ -40,19 +40,19 @@ class _SearchScreenState extends State<SearchScreen> {
   createChatRoomStartConversation({String userName}){
 
     if(userName != Constants.currentUserName){
-      String chatRoomId = getChatRoomId(userName, Constants.currentUserName);
-      List<String> users = [userName, Constants.currentUserName];
+
+      List<String> users = [Constants.currentUserName, userName];
+      String chatRoomId = getChatRoomId(Constants.currentUserName, userName);
+
       Map<String, dynamic> chatRoomMap = {
         "users" : users,
         "chatRoomId" :chatRoomId
       };
       DatabaseMethods().createChatRoom(chatRoomId, chatRoomMap);
-      Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationScreen()));
+      Navigator.push(context, MaterialPageRoute(builder: (context) => ConversationScreen(chatRoomId)));
     }else{
       print("Cannot send message to yourself");
     }
-
-
   }
 
   Widget SearchTile({String userName, String userEmail}){
@@ -169,11 +169,9 @@ class _SearchScreenState extends State<SearchScreen> {
 }
 
 getChatRoomId(String a, String b) {
-  if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-    return "$b\_$a";
-  } else {
-    return "$a\_$b";
-  }
+  var res = [a, b];
+  res.sort();
+  return res[0]+res[1];
 }
 
 
